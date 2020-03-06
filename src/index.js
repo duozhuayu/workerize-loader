@@ -63,7 +63,7 @@ loader.pitch = function(request) {
 	if (this.target!=='webworker' && this.target!=='web') {
 		(new NodeTargetPlugin()).apply(worker.compiler);
 	}
-	
+
 	// webpack >= v4 supports webassembly
 	let wasmPluginPath = null;
 	try {
@@ -134,7 +134,9 @@ loader.pitch = function(request) {
 				worker.url = `URL.createObjectURL(new Blob([${JSON.stringify(contents)}]))`;
 			}
 			else {
-				worker.url = `__webpack_public_path__ + ${JSON.stringify(worker.file)}`;
+				const publicPath = options.publicPath ? JSON.stringify(options.publicPath) : '__webpack_public_path__'
+
+				worker.url = `${publicPath} + ${JSON.stringify(worker.file)}`;
 			}
 
 			if (options.fallback === false) {
