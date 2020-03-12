@@ -124,7 +124,14 @@ loader.pitch = function(request) {
 		if (entries[0]) {
 			worker.file = entries[0].files[0];
 
-			let entry = entries[0].entryModule.resource;
+			let entryModule = entries[0].entryModule;
+			let entry = entryModule.resource;
+
+			if (!entry && entryModule.rootModule.resource) {
+				// handle module concatenation
+				entry = entryModule.rootModule.resource;
+			}
+
 			let contents = compilation.assets[worker.file].source();
 			let exports = Object.keys(CACHE[entry] || {});
 
@@ -134,7 +141,7 @@ loader.pitch = function(request) {
 				worker.url = `URL.createObjectURL(new Blob([${JSON.stringify(contents)}]))`;
 			}
 			else {
-				const publicPath = options.publicPath ? JSON.stringify(options.publicPath) : '__webpack_public_path__'
+				const publicPath = options.publicPath ? JSON.stringify(options.publicPath) : '__webpack_public_path__';
 
 				worker.url = `${publicPath} + ${JSON.stringify(worker.file)}`;
 			}
